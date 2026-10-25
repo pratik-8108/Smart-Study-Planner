@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Study Planner • Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+
+<body data-theme="neutral">
+
+    <!-- Confetti Particle Canvas -->
+    <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
+
+    <!-- Top Gamification & Controls Bar -->
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="brand-group">
+                <div class="brand-badge">STUDY MODE</div>
+                <h1 class="logo-text">Smart Study<span class="dot">.</span></h1>
+            </div>
+
+            <!-- Gamification Profile Bar -->
+            <div class="user-gamify-bar" id="gamifyBar">
+                <!-- User Profile & Avatar Widget -->
+                <button type="button" class="user-profile-widget" id="userProfileWidget" title="Click to customize Nickname & Avatar">
+                    <span class="user-avatar-badge" id="headerUserAvatar">🦊</span>
+                    <span class="user-name-group">
+                        <span class="user-display-name" id="headerUserName">Scholar</span>
+                        <span class="user-edit-hint">✏️ Edit</span>
+                    </span>
+                </button>
+
+                <!-- Streak Badge -->
+                <div class="streak-badge" id="streakBadge" title="Consecutive days studied! Study today to maintain streak.">
+                    <span class="flame-icon">🔥</span>
+                    <span class="streak-num" id="streakCount">1</span>
+                    <span class="streak-label">Day Streak</span>
+                </div>
+
+                <!-- Level & XP Widget -->
+                <div class="level-xp-widget" id="levelWidget" title="Earn XP by completing tasks, Pomodoro sessions & flashcards!">
+                    <div class="level-header">
+                        <span class="level-badge" id="levelBadge">LVL 1</span>
+                        <span class="level-title" id="levelTitle">Novice Scholar</span>
+                    </div>
+                    <div class="xp-bar-track">
+                        <div class="xp-bar-fill" id="xpBarFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="xp-text">
+                        <span id="currentXpText">0</span> / <span id="nextLevelXpText">250</span> XP
+                    </div>
+                </div>
+
+                <!-- Action Controls: Badges, Sound, Backup, Theme -->
+                <div class="header-actions">
+                    <button type="button" class="icon-action-btn" id="openBadgesBtn" title="View Achievements & Trophies" aria-label="Achievements">
+                        <span class="btn-icon">🏆</span>
+                        <span class="btn-label">Badges</span>
+                        <span class="badge-count-pill" id="badgeCountPill">0/12</span>
+                    </button>
+
+                    <button type="button" class="icon-action-btn" id="toggleSoundBtn" title="Toggle Sound Effects" aria-label="Toggle Sound">
+                        <span class="btn-icon" id="soundIcon">🔊</span>
+                    </button>
+
+                    <button type="button" class="icon-action-btn" id="openBackupBtn" title="Backup or Restore Data" aria-label="Data Backup and Restore">
+                        <span class="btn-icon">💾</span>
+                    </button>
+
+                    <!-- Theme Switcher -->
+                    <div class="theme-switcher">
+                        <button
+                            class="theme-trigger"
+                            id="themeTrigger"
+                            type="button"
+                            aria-expanded="false"
+                            aria-controls="themeMenu"
+                            title="Customize Theme Vibe"
+                        >
+                            <span class="palette-icon">✿</span>
+                            <span class="theme-text">Vibe</span>
+                            <span class="chevron" id="themeChevron">⌄</span>
+                        </button>
+
+                        <div class="theme-menu" id="themeMenu" hidden>
+                            <p class="menu-heading">CHOOSE YOUR VIBE</p>
+
+                            <button class="theme-option" type="button" data-theme="neutral" aria-pressed="true">
+                                <span class="theme-swatch neutral-swatch"></span>
+                                <span class="theme-option-text">
+                                    <strong>Neutral Vibes</strong>
+                                    <small>Clean &amp; minimal</small>
+                                </span>
+                                <span class="theme-check">✓</span>
+                            </button>
+
+                            <button class="theme-option" type="button" data-theme="midnight" aria-pressed="false">
+                                <span class="theme-swatch midnight-swatch"></span>
+                                <span class="theme-option-text">
+                                    <strong>Midnight Mood</strong>
+                                    <small>Dark &amp; neon</small>
+                                </span>
+                                <span class="theme-check">✓</span>
+                            </button>
+
+                            <button class="theme-option" type="button" data-theme="hype" aria-pressed="false">
+                                <span class="theme-swatch hype-swatch"></span>
+                                <span class="theme-option-text">
+                                    <strong>Hype Mode</strong>
+                                    <small>Electric violet</small>
+                                </span>
+                                <span class="theme-check">✓</span>
+                            </button>
+
+                            <button class="theme-option" type="button" data-theme="candy" aria-pressed="false">
+                                <span class="theme-swatch candy-swatch"></span>
+                                <span class="theme-option-text">
+                                    <strong>Candy Rush</strong>
+                                    <small>Pink &amp; playful</small>
+                                </span>
+                                <span class="theme-check">✓</span>
+                            </button>
+
+                            <button class="theme-option" type="button" data-theme="fresh" aria-pressed="false">
+                                <span class="theme-swatch fresh-swatch"></span>
+                                <span class="theme-option-text">
+                                    <strong>Fresh Matrix</strong>
+                                    <small>Emerald &amp; dark</small>
+                                </span>
+                                <span class="theme-check">✓</span>
+                            </button>
+
+                            <button class="theme-option" type="button" data-theme="cyber" aria-pressed="false">
+                                <span class="theme-swatch cyber-swatch"></span>
+                                <span class="theme-option-text">
+                                    <strong>Sunset Cyber</strong>
+                                    <small>Cyan &amp; synthwave</small>
+                                </span>
+                                <span class="theme-check">✓</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="app-tab-nav" aria-label="Planner sections">
+        <div class="tabs-container">
+            <button type="button" class="tab-btn active" data-tab="tab-tasks">
+                <span class="tab-icon">📋</span>
+                <span class="tab-title">Tasks &amp; Goals</span>
+            </button>
+            <button type="button" class="tab-btn" data-tab="tab-focus">
+                <span class="tab-icon">🍅</span>
+                <span class="tab-title">Focus &amp; Pomodoro</span>
+            </button>
+            <button type="button" class="tab-btn" data-tab="tab-flashcards">
+                <span class="tab-icon">🗂️</span>
+                <span class="tab-title">Active Recall Deck</span>
+            </button>
+            <button type="button" class="tab-btn" data-tab="tab-stats">
+                <span class="tab-icon">📊</span>
+                <span class="tab-title">Quests &amp; Heatmap</span>
+            </button>
+            <button type="button" class="tab-btn" data-tab="tab-leaderboard">
+                <span class="tab-icon">🏆</span>
+                <span class="tab-title">Study Leagues</span>
+            </button>
+            <button type="button" class="tab-btn" data-tab="tab-scratchpad">
+                <span class="tab-icon">📝</span>
+                <span class="tab-title">Quick Notes</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="main-workspace">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: TASKS & GOALS                       -->
+        <!-- ========================================== -->
+        <section class="tab-content-panel active" id="tab-tasks">
+            <div class="planner-grid">
+                
+                <!-- Left/Top: Add Task Card -->
+                <div class="card add-task-card">
+                    <div class="card-header">
+                        <h2>Add New Task <span class="sparkle">✦</span></h2>
+                        <span class="badge-pill">+25 XP Per Done</span>
+                    </div>
+
+                    <div class="task-form-grid">
+                        <div class="form-group full-width">
+                            <label for="taskInput">Task Name</label>
+                            <input
+                                type="text"
+                                id="taskInput"
+                                placeholder="What do you want to master today? (e.g. Chapter 4 Calculus)"
+                                aria-label="Task name"
+                                maxlength="180"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taskSubject">Subject / Category</label>
+                            <select id="taskSubject" aria-label="Task subject">
+                                <option value="Math">🧮 Math</option>
+                                <option value="Coding">💻 Coding</option>
+                                <option value="Science">🔬 Science</option>
+                                <option value="Language">📚 Language</option>
+                                <option value="Humanities">📖 Humanities</option>
+                                <option value="General" selected>🎯 General</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taskPriority">Priority</label>
+                            <select id="taskPriority" aria-label="Task priority">
+                                <option value="High">🔥 High Priority (+40 XP)</option>
+                                <option value="Medium" selected>⚡ Medium Priority (+25 XP)</option>
+                                <option value="Low">🌱 Low Priority (+15 XP)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taskDate">Deadline</label>
+                            <input
+                                type="date"
+                                id="taskDate"
+                                aria-label="Task deadline"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taskEstTime">Estimated Focus</label>
+                            <select id="taskEstTime" aria-label="Estimated focus duration">
+                                <option value="15">15 min quick sprint</option>
+                                <option value="25" selected>25 min (1 Pomodoro)</option>
+                                <option value="45">45 min deep study</option>
+                                <option value="60">60 min master block</option>
+                                <option value="90">90 min ultra session</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <button id="addTaskBtn" class="primary-btn" type="button">
+                                <span class="btn-text">+ Add Task to Schedule</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right/Top: Today's Metrics & Progress Card -->
+                <div class="card metrics-card">
+                    <div class="card-header">
+                        <h2>Daily Momentum</h2>
+                        <span class="section-tag" id="momentumStatus">IN THE ZONE</span>
+                    </div>
+
+                    <div class="progress-stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-icon">📚</span>
+                            <div class="stat-details">
+                                <h3 id="totalTasks">0</h3>
+                                <p>Total Tasks</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <span class="stat-icon">✅</span>
+                            <div class="stat-details">
+                                <h3 id="completedTasks">0</h3>
+                                <p>Completed</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <span class="stat-icon">⚡</span>
+                            <div class="stat-details">
+                                <h3 id="pendingTasks">0</h3>
+                                <p>Pending</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <span class="stat-icon">🍅</span>
+                            <div class="stat-details">
+                                <h3 id="totalPomodorosCount">0</h3>
+                                <p>Pomodoros</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Progress Bar -->
+                    <div class="progress-container">
+                        <div class="progress-title-row">
+                            <span>Goal Completion</span>
+                            <strong id="completionPercent">0%</strong>
+                        </div>
+                        <div
+                            class="progress-track"
+                            id="progressTrack"
+                            role="progressbar"
+                            aria-label="Task completion"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow="0"
+                        >
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p id="progressMessage" class="progress-motivation">Let's get started!</p>
+                    </div>
+
+                    <!-- Deadline Summary -->
+                    <div id="deadlineSummary" class="deadline-summary" aria-live="polite">
+                        ✨ No tasks due today or tomorrow!
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Task List Section -->
+            <div class="card tasks-list-card">
+                <div class="list-controls-bar">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input
+                            type="search"
+                            id="taskSearchInput"
+                            placeholder="Filter by title or subject..."
+                            aria-label="Search tasks"
+                        >
+                    </div>
+
+                    <div class="sort-wrapper">
+                        <label for="taskSortSelect">Sort:</label>
+                        <select id="taskSortSelect">
+                            <option value="deadline">📅 Earliest Deadline</option>
+                            <option value="priority">🔥 High Priority First</option>
+                            <option value="name">🔤 Alphabetical (A-Z)</option>
+                            <option value="newest">🕒 Newest Added</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="secondary-btn clear-done-btn" id="clearCompletedBtn" title="Remove finished tasks">
+                        🧹 Clear Done
+                    </button>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="filters-container">
+                    <div class="status-filters">
+                        <button type="button" class="filter-btn active" data-filter="all">All</button>
+                        <button type="button" class="filter-btn" data-filter="pending">Pending</button>
+                        <button type="button" class="filter-btn" data-filter="completed">Completed</button>
+                    </div>
+
+                    <div class="priority-filters">
+                        <span class="filter-label">Priority:</span>
+                        <button type="button" class="priority-filter-btn active" data-priority="all">All</button>
+                        <button type="button" class="priority-filter-btn" data-priority="High">High</button>
+                        <button type="button" class="priority-filter-btn" data-priority="Medium">Medium</button>
+                        <button type="button" class="priority-filter-btn" data-priority="Low">Low</button>
+                    </div>
+
+                    <div class="subject-filters">
+                        <span class="filter-label">Subject:</span>
+                        <select id="subjectFilterSelect" class="subject-select-pill">
+                            <option value="all">All Subjects</option>
+                            <option value="Math">🧮 Math</option>
+                            <option value="Coding">💻 Coding</option>
+                            <option value="Science">🔬 Science</option>
+                            <option value="Language">📚 Language</option>
+                            <option value="Humanities">📖 Humanities</option>
+                            <option value="General">🎯 General</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Task List Items -->
+                <ul id="taskList" class="task-list" aria-label="My tasks"></ul>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: FOCUS HUB & POMODORO                -->
+        <!-- ========================================== -->
+        <section class="tab-content-panel" id="tab-focus">
+            <div class="focus-grid">
+
+                <!-- Main Pomodoro Card -->
+                <div class="card pomodoro-card">
+                    <div class="pomodoro-header">
+                        <h2>Deep Work Station</h2>
+                        <button type="button" class="zen-toggle-btn" id="zenModeBtn" title="Toggle Fullscreen Focus">
+                            ⛶ Fullscreen Zen Mode
+                        </button>
+                    </div>
+
+                    <!-- Mode Selectors -->
+                    <div class="timer-mode-selector">
+                        <button type="button" class="mode-btn active" data-mode="pomodoro">🍅 Pomodoro (25m)</button>
+                        <button type="button" class="mode-btn" data-mode="shortBreak">☕ Short Break (5m)</button>
+                        <button type="button" class="mode-btn" data-mode="longBreak">🌴 Long Break (15m)</button>
+                        <button type="button" class="mode-btn" data-mode="stopwatch">⏱️ Free Stopwatch</button>
+                    </div>
+
+                    <!-- Target Task Indicator -->
+                    <div class="active-focus-task-bar" id="activeFocusTaskBar">
+                        <span class="target-label">FOCUSING ON:</span>
+                        <span class="target-task-name" id="activeFocusTaskName">General Deep Work Session</span>
+                        <button type="button" class="change-target-btn" id="changeFocusTargetBtn" title="Select a task to focus on">Change</button>
+                    </div>
+
+                    <!-- Circular Progress Timer -->
+                    <div class="timer-circle-wrap">
+                        <svg class="timer-svg" viewBox="0 0 240 240" aria-hidden="true">
+                            <circle class="timer-circle-bg" cx="120" cy="120" r="105"></circle>
+                            <circle class="timer-circle-progress" id="timerProgressCircle" cx="120" cy="120" r="105"></circle>
+                        </svg>
+                        <div class="timer-digits-wrap">
+                            <div class="timer-display" id="pomodoroDisplay" role="timer">25:00</div>
+                            <span class="timer-sublabel" id="timerSublabel">Ready to begin</span>
+                        </div>
+                    </div>
+
+                    <!-- Timer Controls -->
+                    <div class="timer-controls">
+                        <button type="button" class="primary-btn timer-action-btn" id="timerStartBtn">▶ Start Focus</button>
+                        <button type="button" class="secondary-btn timer-action-btn" id="timerPauseBtn" disabled>⏸ Pause</button>
+                        <button type="button" class="secondary-btn timer-action-btn" id="timerSkipBtn">⏭ Skip Session</button>
+                        <button type="button" class="ghost-btn timer-action-btn" id="timerResetBtn">↺ Reset</button>
+                    </div>
+
+                    <!-- Session Stats Counter -->
+                    <div class="session-stats-bar">
+                        <div class="session-chip">
+                            <span>🍅 Completed Today:</span>
+                            <strong id="pomoSessionsCount">0</strong>
+                        </div>
+                        <div class="session-chip">
+                            <span>⏱️ Minutes in Flow:</span>
+                            <strong id="focusMinutesCount">0</strong> mins
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ambient Audio Generator & Clock Card -->
+                <div class="side-focus-column">
+                    
+                    <!-- Ambient Sound Generator Card (Web Audio API - 0 external files) -->
+                    <div class="card ambient-card">
+                        <div class="card-header">
+                            <h2>Ambient Noise Generator</h2>
+                            <span class="badge-pill">OFFLINE AUDIO</span>
+                        </div>
+                        <p class="ambient-desc">Scientifically tuned frequencies for flow state, synthesized locally without internet.</p>
+
+                        <div class="ambient-grid">
+                            <button type="button" class="ambient-sound-btn" data-sound="rain">
+                                <span class="sound-icon">🌧️</span>
+                                <span class="sound-title">Gentle Rain</span>
+                            </button>
+
+                            <button type="button" class="ambient-sound-btn" data-sound="whitenoise">
+                                <span class="sound-icon">📻</span>
+                                <span class="sound-title">White Noise</span>
+                            </button>
+
+                            <button type="button" class="ambient-sound-btn" data-sound="waves">
+                                <span class="sound-icon">🌊</span>
+                                <span class="sound-title">Ocean Surf</span>
+                            </button>
+
+                            <button type="button" class="ambient-sound-btn" data-sound="binaural">
+                                <span class="sound-icon">🧘</span>
+                                <span class="sound-title">40Hz Alpha</span>
+                            </button>
+                        </div>
+
+                        <!-- Volume Slider -->
+                        <div class="ambient-controls-row">
+                            <label for="ambientVolumeSlider">Volume:</label>
+                            <input type="range" id="ambientVolumeSlider" min="0" max="1" step="0.05" value="0.3">
+                            <button type="button" class="stop-sound-btn" id="stopAmbientBtn">Stop All</button>
+                        </div>
+                    </div>
+
+                    <!-- Live Clock & Date Widget -->
+                    <div class="card clock-card">
+                        <p class="tool-label">CURRENT REAL TIME</p>
+                        <div id="liveClock" class="live-clock">00:00:00</div>
+                        <p id="liveDate" class="live-date">Loading date...</p>
+                        <span class="clock-timezone">Local Timezone</span>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: ACTIVE RECALL FLASHCARDS            -->
+        <!-- ========================================== -->
+        <section class="tab-content-panel" id="tab-flashcards">
+            <div class="flashcards-layout">
+                
+                <div class="flashcards-topbar">
+                    <div class="deck-title-group">
+                        <h2>Active Recall Flashcards</h2>
+                        <p class="subtitle">Spaced repetition deck to test your retention and earn XP!</p>
+                    </div>
+
+                    <div class="deck-actions">
+                        <select id="flashcardDeckFilter" class="deck-filter-select">
+                            <option value="all">All Decks</option>
+                            <option value="General">🎯 General Study</option>
+                            <option value="Coding">💻 Coding &amp; Tech</option>
+                            <option value="Math">🧮 Math &amp; Formulas</option>
+                            <option value="Science">🔬 Science</option>
+                        </select>
+
+                        <button type="button" class="primary-btn" id="openNewCardBtn">
+                            + Create Flashcard
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3D Flip Card Container -->
+                <div class="flashcard-scene">
+                    <div class="flashcard-3d" id="flashcardElement" tabindex="0" role="button" aria-label="Flashcard. Press to flip.">
+                        <!-- Front Face -->
+                        <div class="card-face card-front">
+                            <div class="card-tag" id="cardCategoryTag">GENERAL STUDY</div>
+                            <div class="card-content-center">
+                                <p class="card-text" id="cardFrontText">What is the Feynman Technique for rapid learning?</p>
+                            </div>
+                            <div class="card-footer-hint">Click or press Space to flip ↺</div>
+                        </div>
+
+                        <!-- Back Face -->
+                        <div class="card-face card-back">
+                            <div class="card-tag" id="cardAnswerTag">ANSWER &amp; EXPLANATION</div>
+                            <div class="card-content-center">
+                                <p class="card-text" id="cardBackText">Teach the concept in simple, jargon-free words as if explaining it to a 6th grader. Identify your knowledge gaps and refine!</p>
+                            </div>
+                            <div class="card-footer-hint">Click to flip back ↺</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Practice Feedback Controls -->
+                <div class="flashcard-controls">
+                    <button type="button" class="card-nav-btn" id="prevCardBtn" title="Previous card">← Previous</button>
+
+                    <div class="recall-grading-buttons">
+                        <button type="button" class="recall-btn needs-work-btn" id="recallHardBtn">
+                            <span>❌ Hard / Review Later</span>
+                        </button>
+                        <button type="button" class="recall-btn got-it-btn" id="recallEasyBtn">
+                            <span>✅ Got It! (+10 XP)</span>
+                        </button>
+                    </div>
+
+                    <button type="button" class="card-nav-btn" id="nextCardBtn" title="Next card">Next →</button>
+                </div>
+
+                <div class="card-progress-indicator">
+                    Card <strong id="currentCardIndex">1</strong> of <strong id="totalCardsCount">5</strong>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: STATS, HEATMAP & QUESTS             -->
+        <!-- ========================================== -->
+        <section class="tab-content-panel" id="tab-stats">
+            <div class="stats-grid">
+
+                <!-- Daily Quests Card -->
+                <div class="card quests-card">
+                    <div class="card-header">
+                        <h2>Daily Quests <span class="sparkle">🎯</span></h2>
+                        <span class="badge-pill">RESETS DAILY</span>
+                    </div>
+                    <p class="section-subtitle">Complete daily missions to earn bonus XP and climb leader ranks!</p>
+
+                    <div class="quests-list" id="questsList">
+                        <!-- Quests rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- 30-Day Activity Heatmap Card -->
+                <div class="card heatmap-card">
+                    <div class="card-header">
+                        <h2>30-Day Study Activity Heatmap</h2>
+                        <span class="badge-pill">CONSISTENCY GRAPH</span>
+                    </div>
+                    <p class="section-subtitle">Visual record of tasks completed and focus sessions logged over the last 30 days.</p>
+
+                    <div class="heatmap-grid" id="heatmapGrid">
+                        <!-- Generated by JS -->
+                    </div>
+
+                    <div class="heatmap-legend">
+                        <span>Less</span>
+                        <span class="legend-box level-0"></span>
+                        <span class="legend-box level-1"></span>
+                        <span class="legend-box level-2"></span>
+                        <span class="legend-box level-3"></span>
+                        <span class="legend-box level-4"></span>
+                        <span>More Activity</span>
+                    </div>
+                </div>
+
+                <!-- Study Insights & Milestones Card -->
+                <div class="card insights-card full-span">
+                    <div class="card-header">
+                        <h2>Study Milestones &amp; Records</h2>
+                    </div>
+
+                    <div class="insights-grid">
+                        <div class="insight-box">
+                            <span class="insight-icon">⚡</span>
+                            <div class="insight-val" id="totalXpEarnedVal">0</div>
+                            <div class="insight-label">Lifetime XP Earned</div>
+                        </div>
+
+                        <div class="insight-box">
+                            <span class="insight-icon">🔥</span>
+                            <div class="insight-val" id="bestStreakVal">1</div>
+                            <div class="insight-label">Best Study Streak</div>
+                        </div>
+
+                        <div class="insight-box">
+                            <span class="insight-icon">🏆</span>
+                            <div class="insight-val" id="unlockedBadgesVal">0 / 12</div>
+                            <div class="insight-label">Achievements Claimed</div>
+                        </div>
+
+                        <div class="insight-box">
+                            <span class="insight-icon">⏱️</span>
+                            <div class="insight-val" id="totalFocusHoursVal">0.0h</div>
+                            <div class="insight-label">Total Time in Deep Focus</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB: STUDY LEAGUES & LEADERBOARD           -->
+        <!-- ========================================== -->
+        <section class="tab-content-panel" id="tab-leaderboard">
+            <div class="leaderboard-layout">
+                
+                <!-- League Banner -->
+                <div class="card league-banner-card">
+                    <div class="league-banner-content">
+                        <div class="league-badge-wrap">
+                            <span class="league-trophy-large" id="leagueIcon">🥉</span>
+                            <div class="league-meta">
+                                <span class="league-tag">CURRENT DIVISION</span>
+                                <h2 id="leagueTitle">Bronze League</h2>
+                                <p class="league-desc" id="leagueDesc">Finish in the Top 3 this week to advance to Silver League!</p>
+                            </div>
+                        </div>
+
+                        <div class="league-stats-pill">
+                            <span class="pill-label">Weekly Season</span>
+                            <strong id="leagueSeasonCountdown">Resets in 4 days</strong>
+                            <small class="promotion-hint">▲ Top 3 Promote • ▼ Bottom 2 Demote</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top 3 Podium Showcase -->
+                <div class="podium-card card">
+                    <div class="podium-container" id="podiumContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Full Leaderboard Rankings Table -->
+                <div class="card rankings-card">
+                    <div class="card-header">
+                        <h2>Weekly Standings <span class="sparkle">🏆</span></h2>
+                        <span class="badge-pill" id="userCurrentRankPill">Your Rank: #1</span>
+                    </div>
+
+                    <div class="rankings-table-wrap">
+                        <table class="rankings-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Scholar</th>
+                                    <th>Subject</th>
+                                    <th>Level</th>
+                                    <th>Weekly XP</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingsTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Peer Study Circle & Free Friend Code Exchange -->
+                <div class="card friend-exchange-card">
+                    <div class="card-header">
+                        <h2>Study Circle • Compete with Friends <span class="sparkle">🤝</span></h2>
+                        <span class="badge-pill">100% FREE PEER CODES</span>
+                    </div>
+                    <p class="section-subtitle">No server or account needed! Share your friend code with classmates or friends over WhatsApp/Discord, paste their codes below, and see them right on your leaderboard.</p>
+
+                    <div class="friend-code-grid">
+                        <div class="friend-tile">
+                            <h4>Your Shareable Friend Code</h4>
+                            <p>Share this code with your study buddies:</p>
+                            <div class="friend-code-box">
+                                <code id="myFriendCodeDisplay">SSP#Scholar#🦊#Lvl1#0XP#1Streak</code>
+                                <button type="button" class="primary-btn" id="copyFriendCodeBtn">📋 Copy Code</button>
+                            </div>
+                        </div>
+
+                        <div class="friend-tile">
+                            <h4>Add a Friend's Code</h4>
+                            <p>Paste your friend's code to add them to your leaderboard:</p>
+                            <div class="friend-input-box">
+                                <input type="text" id="addFriendInput" placeholder="e.g. SSP#Aman#⚡#Lvl2#450XP#3Streak">
+                                <button type="button" class="secondary-btn" id="addFriendBtn">+ Add Friend</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: QUICK BRAIN DUMP SCRATCHPAD         -->
+        <!-- ========================================== -->
+        <section class="tab-content-panel" id="tab-scratchpad">
+            <div class="card scratchpad-card">
+                <div class="card-header">
+                    <h2>Quick Notes &amp; Brain Dump <span class="sparkle">✏️</span></h2>
+                    <div class="scratchpad-header-actions">
+                        <button type="button" class="secondary-btn" id="copyNotesBtn">📋 Copy Notes</button>
+                        <button type="button" class="ghost-btn" id="clearNotesBtn">Clear</button>
+                    </div>
+                </div>
+                <p class="section-subtitle">Park sudden distracting thoughts, formulas, or study notes here without breaking your flow. Auto-saved locally!</p>
+
+                <textarea
+                    id="scratchpadText"
+                    class="scratchpad-textarea"
+                    placeholder="Write quick study formulas, notes to remember, or sudden thoughts..."
+                    aria-label="Study notes and brain dump"
+                ></textarea>
+
+                <div class="scratchpad-footer">
+                    <span id="scratchpadCharCount">0 words · 0 characters</span>
+                    <span class="save-status" id="scratchpadStatus">✓ Auto-saved to device</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- MODALS & DIALOGS                           -->
+    <!-- ========================================== -->
+
+    <!-- 1. Edit Task Modal -->
+    <div id="editTaskModal" class="modal-backdrop" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="editTaskHeading">
+            <div class="modal-header">
+                <h3 id="editTaskHeading">Edit Your Task ✏️</h3>
+                <button type="button" class="close-modal-btn" id="closeEditModalBtn" aria-label="Close modal">✕</button>
+            </div>
+
+            <div class="modal-form">
+                <div class="form-group">
+                    <label for="editTaskName">Task Name</label>
+                    <input type="text" id="editTaskName" maxlength="180" required>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label for="editTaskSubject">Subject</label>
+                        <select id="editTaskSubject">
+                            <option value="Math">🧮 Math</option>
+                            <option value="Coding">💻 Coding</option>
+                            <option value="Science">🔬 Science</option>
+                            <option value="Language">📚 Language</option>
+                            <option value="Humanities">📖 Humanities</option>
+                            <option value="General">🎯 General</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTaskPriority">Priority</label>
+                        <select id="editTaskPriority">
+                            <option value="High">🔥 High Priority</option>
+                            <option value="Medium">⚡ Medium Priority</option>
+                            <option value="Low">🌱 Low Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editTaskDate">Deadline</label>
+                    <input type="date" id="editTaskDate">
+                </div>
+
+                <p id="editTaskError" class="modal-error" hidden></p>
+
+                <div class="modal-buttons">
+                    <button type="button" id="saveEditBtn" class="primary-btn">Save Changes</button>
+                    <button type="button" id="cancelEditBtn" class="secondary-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Badges & Achievements Modal -->
+    <div id="badgesModal" class="modal-backdrop" hidden>
+        <div class="modal-card wide-modal" role="dialog" aria-modal="true" aria-labelledby="badgesHeading">
+            <div class="modal-header">
+                <div>
+                    <h3 id="badgesHeading">Achievements &amp; Trophies 🏆</h3>
+                    <p class="modal-subtitle">Unlock badges by reaching study streaks, finishing tasks, and staying in flow!</p>
+                </div>
+                <button type="button" class="close-modal-btn" id="closeBadgesModalBtn" aria-label="Close modal">✕</button>
+            </div>
+
+            <div class="badges-grid" id="badgesGrid">
+                <!-- Badges populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. New Flashcard Modal -->
+    <div id="newCardModal" class="modal-backdrop" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="newCardHeading">
+            <div class="modal-header">
+                <h3 id="newCardHeading">Create New Flashcard 🗂️</h3>
+                <button type="button" class="close-modal-btn" id="closeNewCardModalBtn" aria-label="Close modal">✕</button>
+            </div>
+
+            <div class="modal-form">
+                <div class="form-group">
+                    <label for="newCardSubject">Deck Subject</label>
+                    <select id="newCardSubject">
+                        <option value="General">🎯 General Study</option>
+                        <option value="Coding">💻 Coding &amp; Tech</option>
+                        <option value="Math">🧮 Math &amp; Formulas</option>
+                        <option value="Science">🔬 Science</option>
+                        <option value="Language">📚 Language</option>
+                        <option value="Humanities">📖 Humanities</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="newCardQuestion">Front (Question / Concept)</label>
+                    <textarea id="newCardQuestion" rows="3" placeholder="e.g. What is Pareto's 80/20 principle in studying?" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="newCardAnswer">Back (Answer / Summary)</label>
+                    <textarea id="newCardAnswer" rows="3" placeholder="e.g. 80% of exam results often come from 20% of the core concepts." required></textarea>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" id="saveNewCardBtn" class="primary-btn">Save Flashcard (+15 XP)</button>
+                    <button type="button" id="cancelNewCardBtn" class="secondary-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Data Backup & Restore Modal -->
+    <div id="backupModal" class="modal-backdrop" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="backupHeading">
+            <div class="modal-header">
+                <h3 id="backupHeading">Data Backup &amp; Portability 💾</h3>
+                <button type="button" class="close-modal-btn" id="closeBackupModalBtn" aria-label="Close modal">✕</button>
+            </div>
+
+            <div class="backup-content">
+                <p>Your planner data (tasks, XP, streaks, flashcards, notes) is saved securely on this device without any external server or API.</p>
+
+                <div class="backup-actions-grid">
+                    <div class="backup-tile">
+                        <h4>Export JSON Backup</h4>
+                        <p>Save a complete snapshot file to your computer.</p>
+                        <button type="button" class="primary-btn" id="exportDataBtn">📥 Export Backup (.json)</button>
+                    </div>
+
+                    <div class="backup-tile">
+                        <h4>Restore From File</h4>
+                        <p>Restore your planner state from a previous backup file.</p>
+                        <label for="importFileInput" class="secondary-btn file-upload-label">
+                            📤 Choose JSON File
+                        </label>
+                        <input type="file" id="importFileInput" accept=".json" hidden>
+                    </div>
+                </div>
+
+                <div class="sample-data-row">
+                    <span>New here or want a preview?</span>
+                    <button type="button" class="ghost-btn" id="loadSampleDataBtn">✨ Load Demo Sample Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Profile Customization Modal -->
+    <div id="profileModal" class="modal-backdrop" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="profileHeading">
+            <div class="modal-header">
+                <div>
+                    <h3 id="profileHeading">Customize Your Profile 👤</h3>
+                    <p class="modal-subtitle">Choose your avatar and study nickname for the leaderboard!</p>
+                </div>
+                <button type="button" class="close-modal-btn" id="closeProfileModalBtn" aria-label="Close modal">✕</button>
+            </div>
+
+            <div class="modal-form">
+                <div class="form-group">
+                    <label for="profileNicknameInput">Your Nickname</label>
+                    <input type="text" id="profileNicknameInput" maxlength="16" placeholder="e.g. Shubham, FocusNinja..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Choose Your Avatar</label>
+                    <div class="avatar-picker-grid" id="avatarPickerGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="profile-preview-card" id="profilePreviewCard">
+                    <span class="preview-avatar" id="previewAvatarDisplay">🦊</span>
+                    <div class="preview-info">
+                        <strong class="preview-name" id="previewNameDisplay">Scholar</strong>
+                        <small class="preview-role" id="previewRoleDisplay">Lvl 1 Novice Scholar • 0 XP</small>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" id="saveProfileBtn" class="primary-btn">Save Profile ✨</button>
+                    <button type="button" id="cancelProfileBtn" class="secondary-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification for Task Undo & Alerts -->
+    <div id="toastNotification" class="toast-notification" role="status" aria-live="polite">
+        <span id="toastMessage">Action completed</span>
+        <button type="button" id="toastUndoBtn" class="toast-undo-btn" hidden>Undo</button>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <span>✦</span> <strong>Plan for Yourself</strong> • Master your focus, level up your mind.
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
